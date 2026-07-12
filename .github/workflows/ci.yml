@@ -17,12 +17,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install & Test GuardianApp
         working-directory: GuardianApp
         run: |
-          npm ci
+          # Use npm ci when a lockfile is present for reproducible installs, otherwise fall back to npm install
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
+            npm ci
+          else
+            npm install
+          fi
           if node -e "process.exit(require('./package.json').scripts && require('./package.json').scripts.lint ? 0 : 1)"; then npm run lint; else echo 'no lint script'; fi
           if node -e "process.exit(require('./package.json').scripts && require('./package.json').scripts.test ? 0 : 1)"; then npm test; else echo 'no test script'; fi
           if node -e "process.exit(require('./package.json').scripts && require('./package.json').scripts.build ? 0 : 1)"; then npm run build; else echo 'no build script'; fi
