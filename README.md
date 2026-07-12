@@ -1,5 +1,7 @@
 # Guardian Excel — AI-Powered Multi-Tiered Safety System
 
+[![CI](https://github.com/Infosanjay-2k04/GUARDIAN-EXCEL/actions/workflows/ci.yml/badge.svg)](https://github.com/Infosanjay-2k04/GUARDIAN-EXCEL/actions/workflows/ci.yml)
+
 🏆 Runner-Up — GIST'26 National Symposium, Chennai  
 🏆 Top 4 — SCIMIT'26 among 700+ teams, Puducherry  
 🏆 Cash Prize — TECHYUGAM'26, Vel Tech University, Chennai  
