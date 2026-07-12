@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "GuardianApp",
+    "slug": "GuardianApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png", 
+    "scheme": "myapp",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Guardian needs access to location for real-time tactical tracking.",
+        "NSLocationAlwaysUsageDescription": "Guardian tracks location to provide emergency assistance."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "BATTERY_STATS",
+        "VIBRATE"
+      ],
+      "package": "com.sanjay.guardianapp",
+      "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY_HERE"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysPermission": "Allow Guardian to detect your location in the background."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
