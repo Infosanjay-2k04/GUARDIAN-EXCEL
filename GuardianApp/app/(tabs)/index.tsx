@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Battery from 'expo-battery';
 import * as Location from 'expo-location';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
@@ -58,7 +58,11 @@ export default function GuardianTacticalApp() {
   const isAutoLocateRef = useRef<boolean>(isAutoLocate);
 
   // Keep refs in sync with state
-  useEffect(() => { isSecureRef.current = isSecure; isSosRef.current = isSosActive; isAutoLocateRef.current = isAutoLocate; });
+  useEffect(() => {
+    isSecureRef.current = isSecure;
+    isSosRef.current = isSosActive;
+    isAutoLocateRef.current = isAutoLocate;
+  }, [isSecure, isSosActive, isAutoLocate]);
   
   const pulse1 = useSharedValue(0);
   const pulse2 = useSharedValue(0);
@@ -73,7 +77,6 @@ export default function GuardianTacticalApp() {
     setBlockchainId(hash + '...');
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     pulse1.value = withRepeat(withTiming(1, { duration: 2000 }), -1, false);
     pulse2.value = withDelay(1000, withRepeat(withTiming(1, { duration: 2000 }), -1, false));
@@ -90,7 +93,7 @@ export default function GuardianTacticalApp() {
       }
     };
     getBatt();
-  }, []);
+  }, [pulse1, pulse2, slowBlink]);
 
   const radarPulseStyle1 = useAnimatedStyle(() => ({
     transform: [{ scale: interpolate(pulse1.value, [0, 1], [1, 4]) }],
@@ -112,7 +115,7 @@ export default function GuardianTacticalApp() {
     opacity: scanOpacity.value,
   }));
 
-  const connect = () => {
+  const connect = useCallback(() => {
     try {
       ws.current = new WebSocket(WS_URL);
       ws.current.onopen = () => {
@@ -135,27 +138,26 @@ export default function GuardianTacticalApp() {
       console.log('❌ WebSocket connection error:', e);
       setStatus('ERROR');
     }
-  };
+  }, []);
 
-  const sendPacket = (type: string, level: string, loc: LocationData | null) => {
+  const sendPacket = useCallback((type: string, level: string, loc: LocationData | null) => {
     try {
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
         ws.current.send(JSON.stringify({
-          type, 
+          type,
           threat_level: level,
           lat: loc?.coords.latitude || 0,
           lon: loc?.coords.longitude || 0,
           battery: batteryLevel,
-          blockchain_id: blockchainId
+          blockchain_id: blockchainId,
         }));
         console.log(`📤 Packet sent: ${type}`);
       }
     } catch (e) {
       console.log('❌ Send packet error:', e);
     }
-  };
+  }, [batteryLevel, blockchainId]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Connect once when component mounts
     connect();
@@ -205,7 +207,7 @@ export default function GuardianTacticalApp() {
         console.log('Error removing watcher:', e);
       }
     };
-  }, []);
+  }, [connect, sendPacket]);
 
   const handleAiScan = () => {
     try {
